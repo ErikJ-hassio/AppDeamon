@@ -62,9 +62,12 @@ class GaragePort(hass.Hass):
         #####
         # Action
         self.log("")
+
+        user = globals.user_ids.values()
         for person in self.g_persons:
             tmp = f"person.{person}"
             assert self.entity_exists(tmp),           f"Illegal format: {tmp}"
+            assert person in user,                    f"Illegal format: {person}"
         assert self.entity_exists(self.g_init),       f"Illegal format: {self.g_init}"
         assert self.entity_exists(self.g_code_input), f"Illegal format: {self.g_code_input}"
         assert self.entity_exists(self.g_action),     f"Illegal format: {self.g_action}"

@@ -1,4 +1,8 @@
 ---
+globals:
+  module: globals
+  class: Globals
+
 hello_world:
   module: hello
   class: HelloWorld
@@ -16,7 +20,7 @@ garage_port:
     - 'erik'
     - 'ulrika'
   # debug: 1
-  # dependencies: globals
+  dependencies: globals
 
 window_lights:
   module: autolights
