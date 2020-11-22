@@ -48,6 +48,7 @@ import datetime
 #     Start a debug if the Args is "something"
 #
 
+
 class AutoLights(hass.Hass):
 
     def initialize(self):

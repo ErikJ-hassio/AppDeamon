@@ -27,6 +27,7 @@ import globals
 #     Starta debug if the Args is "something"
 #
 
+
 class GaragePort(hass.Hass):
 
     def initialize(self):
@@ -96,6 +97,7 @@ class GaragePort(hass.Hass):
         #  'context': {'id': 'def3224ea1bd584f3acd68b7b2e44cac', 'parent_id': None,
         #              'user_id': '991defd8cdab4044978bff2a052569e7'}}
         user_id = self.get_state(entity_id=self.g_init, attribute='all')['context']['user_id']
+        # user_id = self.get_state(entity_id=self.g_init, attribute='all')['context']['user_id']
         user = globals.user_ids[user_id]
         self.debug(d, f"   user = {user}: {user_id}")
 
