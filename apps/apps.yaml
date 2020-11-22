@@ -1,0 +1,49 @@
+---
+hello_world:
+  module: hello
+  class: HelloWorld
+
+garage_port:
+  module: garageport
+  class: GaragePort
+  init: 'input_boolean.garageport'
+  code: !secret api_pin
+  code_input: 'input_text.garageport_kod'
+  action: 'switch.b11'
+  timer: 10
+  power: 'switch.b13'
+  persons:
+    - 'erik'
+    - 'ulrika'
+  # debug: 1
+  # dependencies: globals
+
+window_lights:
+  module: autolights
+  class: AutoLights
+  init: 'input_boolean.fonsterlyset'
+  actions:
+    - 'switch.b1'         # B1     Tvattstugan
+    - 'switch.db1_1'      # DB1-1  Vardagrum
+    - 'switch.b2'         # B2     Vardagrum 2
+    - 'switch.b6'         # B6     Kök
+  auto_ons:
+    - '-00:41:15 relative the sun'
+  auto_offs:
+    - '23:00:00 absolute time'
+    - '10:00:00 time'
+  #debug: 1
+
+outside_lights:
+  module: autolights
+  class: AutoLights
+  init: 'input_boolean.utelyset'
+  actions:
+    - 'switch.db2_1'      # DB2-1  Bro utelyse
+    - 'switch.db3_1'      # DB3-1  Garage utelyse
+    - 'switch.b9'         # B9     Friggebo utelyse (all ström påverkas) + uteuttag
+  auto_ons:
+    - '-00:00:15 relative the sun'
+  auto_offs:
+    - '+00:00:15'
+  #debug: 1
