@@ -2,9 +2,8 @@ import appdaemon.plugins.hass.hassapi as hass
 import re
 import datetime
 
-
 ######
-# Auto Lights App
+# AutoLights App
 #
 # Args:
 #   init:
@@ -46,7 +45,7 @@ import datetime
 #                               - '-0'
 #
 #   debug:
-#     Starta debug if the Args is "something"
+#     Start a debug if the Args is "something"
 #
 
 class AutoLights(hass.Hass):
@@ -58,7 +57,9 @@ class AutoLights(hass.Hass):
         # Globals parameters
         self.g_debug = 0
         self.g_debug_print = False
-        if "debug" in self.args: self.g_debug_print = True
+        if "debug" in self.args:
+            self.log("   - _ - DEBUG - _ - ")
+            self.g_debug_print = True
 
         self.g_init = self.args["init"]
         self.g_actions = self.args["actions"]
@@ -81,11 +82,9 @@ class AutoLights(hass.Hass):
         #####
         # Action
         self.log("")
-        if not self.entity_exists(self.g_init):
-            raise Exception(f"Illegal format: {self.g_init}")
+        assert self.entity_exists(self.g_init), f"Illegal format: {self.g_init}"
         for action in self.g_actions:
-            if not self.entity_exists(action):
-                raise Exception(f"Illegal format: {action}")
+            assert self.entity_exists(action),  f"Illegal format: {action}"
 
         self.log(f"  listen_state(action_cb, {self.g_init})")
         self.listen_state(self.action_cb, self.g_init)
@@ -128,9 +127,9 @@ class AutoLights(hass.Hass):
         self.debug(d, f"    kwargs    = {kwargs}")
         self.debug(d, ")")
 
-        if attribute != 'state':     raise Exception(f"Illegal format: {attribute}")
-        if old == new:               raise Exception(f"Illegal format: {old}")
-        if new not in ['on', 'off']: raise Exception(f"Illegal format: {new}")
+        assert attribute == 'state',     f"Illegal format: {attribute}"
+        assert old != new,               f"Illegal format: {old}"
+        assert new in ['on', 'off'],     f"Illegal format: {new}"
 
         if new == "on":
             self.debug(d, f"  turn_on({self.g_init})")
@@ -153,9 +152,9 @@ class AutoLights(hass.Hass):
         self.debug(d, f"    kwargs    = {kwargs}")
         self.debug(d, ")")
 
-        if attribute != 'state':     raise Exception(f"Illegal format: {attribute}")
-        if old == new:               raise Exception(f"Illegal format: {old}")
-        if new not in ['on', 'off']: raise Exception(f"Illegal format: {new}")
+        assert attribute == 'state',     f"Illegal format: {attribute}"
+        assert old != new,               f"Illegal format: {old}"
+        assert new in ['on', 'off'],     f"Illegal format: {new}"
 
         for lamp in self.g_actions:
             self.debug(d, f"  - {lamp}: state={new})")
@@ -171,8 +170,10 @@ class AutoLights(hass.Hass):
         self.debug(d, "AutoLights:off_cb(")
         self.debug(d, f"    kwargs={kwargs}")
         self.debug(d, ")")
+
         self.debug(d, f"  turn_off({self.g_init})")
         self.turn_off(self.g_init)
+
         self.debug(d, "return()")
         self.g_debug -= 1
 
@@ -182,8 +183,10 @@ class AutoLights(hass.Hass):
         self.debug(d, "AutoLights:on_cb(")
         self.debug(d, f"    kwargs={kwargs}")
         self.debug(d, ")")
+
         self.debug(d, f"  turn_on({self.g_init})")
         self.turn_on(self.g_init)
+
         self.debug(d, "return()")
         self.g_debug -= 1
 
@@ -236,35 +239,35 @@ class AutoLights(hass.Hass):
         mm = "0"
         ss = "0"
 
-        if len(timestr) == 0:             raise Exception(f"Illegal format: {timestr}")
+        assert len(timestr) != 0,             f"Illegal format: {timestr}"
         tmp = re.split(" ", timestr)[0]
-        if len(tmp) == 0:                 raise Exception(f"Illegal format: {timestr}")
+        assert len(tmp) != 0,                 f"Illegal format: {timestr}"
         tmp = re.split(":", tmp)
-        if len(tmp[0]) == 0:              raise Exception(f"Illegal format: {timestr}")
+        assert len(tmp[0]) != 0,              f"Illegal format: {timestr}"
 
         if tmp[0][0] in ['+', '-']:
-            if len(tmp) not in [1, 2, 3]: raise Exception(f"Illegal format: {timestr}")
+            assert len(tmp) in [1, 2, 3],     f"Illegal format: {timestr}"
             sign = tmp[0][0]
             tmp[0] = tmp[0][1:len(tmp[0])]
         else:
-            if len(tmp) not in [3]:       raise Exception(f"Illegal format: {timestr}")
+            assert len(tmp) in [3],           f"Illegal format: {timestr}"
 
         level = len(tmp)
         for nbr in tmp:
-            if not nbr.isnumeric():       raise Exception(f"Illegal format: {timestr}")
+            assert nbr.isnumeric(),           f"Illegal format: {timestr}"
             if level == 3:  # Hours
-                if int(nbr) < 0:          raise Exception(f"Illegal format: {timestr}")
-                if int(nbr) > 24:         raise Exception(f"Illegal format: {timestr}")
+                assert int(nbr) >= 0,         f"Illegal format: {timestr}"
+                assert int(nbr) < 24,         f"Illegal format: {timestr}"
                 hh = f"{int(nbr)}"
 
             if level == 2:  # min
-                if int(nbr) < 0:          raise Exception(f"Illegal format: {timestr}")
-                if int(nbr) > 60:         raise Exception(f"Illegal format: {timestr}")
+                assert int(nbr) >= 0,          f"Illegal format: {timestr}"
+                assert int(nbr) < 60,          f"Illegal format: {timestr}"
                 mm = f"{int(nbr)}"
 
             if level == 1:  # sec
-                if int(nbr) < 0:          raise Exception(f"Illegal format: {timestr}")
-                if int(nbr) > 60:         raise Exception(f"Illegal format: {timestr}")
+                assert int(nbr) >= 0,          f"Illegal format: {timestr}"
+                assert int(nbr) < 60,          f"Illegal format: {timestr}"
                 ss = f"{int(nbr)}"
             level -= 1
 

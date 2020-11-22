@@ -2,7 +2,7 @@ import appdaemon.plugins.hass.hassapi as hass
 import globals
 
 #
-# Garage Port App
+# GaragePort App
 #
 # Args:
 #   init:
@@ -32,9 +32,6 @@ class GaragePort(hass.Hass):
     def initialize(self):
         self.log("GaragePort:initialize()")
 
-        # for t in self.args: print(f"  {t} : {self.args[t]}")
-        # for t in dir(self.args): print(f"  {t}")
-
         #####
         # globals parameters
         self.g_debug = 0
@@ -51,7 +48,6 @@ class GaragePort(hass.Hass):
         self.g_power = self.args["power"]
         self.g_persons = self.args["persons"]
 
-
         self.log(f"  init       = {self.g_init}")
         self.log(f"  code       = ******")
         self.log(f"  code_input = {self.g_code_input}")
@@ -67,16 +63,11 @@ class GaragePort(hass.Hass):
         self.log("")
         for person in self.g_persons:
             tmp = f"person.{person}"
-            if not self.entity_exists(tmp):
-                raise Exception(f"Illegal format: {tmp}")
-        if not self.entity_exists(self.g_init):
-            raise Exception(f"Illegal format: {self.g_init}")
-        if not self.entity_exists(self.g_code_input):
-            raise Exception(f"Illegal format: {self.g_code_input}")
-        if not self.entity_exists(self.g_action):
-            raise Exception(f"Illegal format: {self.g_action}")
-        if not self.entity_exists(self.g_power):
-            raise Exception(f"Illegal format: {self.g_power}")
+            assert self.entity_exists(tmp),           f"Illegal format: {tmp}"
+        assert self.entity_exists(self.g_init),       f"Illegal format: {self.g_init}"
+        assert self.entity_exists(self.g_code_input), f"Illegal format: {self.g_code_input}"
+        assert self.entity_exists(self.g_action),     f"Illegal format: {self.g_action}"
+        assert self.entity_exists(self.g_power),      f"Illegal format: {self.g_power}"
 
         self.log(f"  listen_state(action_cb, {self.g_init}, new='on')")
         self.listen_state(self.action_cb, self.g_init, new="on")
@@ -93,10 +84,11 @@ class GaragePort(hass.Hass):
         self.debug(d, f"    new       = {new}")
         self.debug(d, f"    kwargs    = {kwargs}")
         self.debug(d, ")")
-        if entity != self.g_init:    raise Exception(f"Illegal format: {entity}")
-        if attribute != 'state':     raise Exception(f"Illegal format: {attribute}")
-        if old == new:               raise Exception(f"Illegal format: {old}")
-        if new not in ['on', 'off']: raise Exception(f"Illegal format: {new}")
+
+        assert entity == self.g_init,    f"Illegal format: {entity}"
+        assert attribute == 'state',     f"Illegal format: {attribute}"
+        assert old != new,               f"Illegal format: {old}"
+        assert new in ['on', 'off'],     f"Illegal format: {new}"
 
         # {'entity_id': 'input_boolean.garageport', 'state': 'on',
         #  'attributes': {'editable': True, 'friendly_name': 'Garageport'},
@@ -129,6 +121,7 @@ class GaragePort(hass.Hass):
 
         self.debug(d, f"   run_in(terminate_cb, timer={self.g_timer})")
         self.run_in(self.terminate_cb, self.g_timer)
+
         self.debug(d, f"return()")
         self.g_debug -= 1
 
@@ -138,8 +131,10 @@ class GaragePort(hass.Hass):
         self.debug(d, "GaragePort:terminate(")
         self.debug(d, f"    kwargs    = {kwargs}")
         self.debug(d, ")")
+
         self.debug(d, f"   turn_off({self.g_init})")
         self.turn_off(self.g_init)
+
         self.debug(d, f"return()")
         self.g_debug -= 1
 
