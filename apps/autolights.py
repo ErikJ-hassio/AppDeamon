@@ -92,8 +92,8 @@ class AutoLights(hass.Hass):
 
         self.log(f"  action:")
         for action in self.g_actions:
-            self.log(f"    - listen_state(action_cb, {action})")
-            self.listen_state(self.action_cb, action)
+            self.log(f"    - listen_state(manual_cb, {action})")
+            self.listen_state(self.manual_cb, action)
 
         self.log("  auto_on:")
         for auto_on in self.g_auto_ons:
@@ -117,6 +117,31 @@ class AutoLights(hass.Hass):
 
         self.log("return()")
 
+    def manual_cb(self, entity, attribute, old, new, kwargs):
+        self.g_debug += 1
+        d = self.g_debug
+        self.debug(d, "AutoLights:manual_cb(")
+        self.debug(d, f"    entity    = {entity}")
+        self.debug(d, f"    attribute = {attribute}")
+        self.debug(d, f"    old       = {old}")
+        self.debug(d, f"    new       = {new}")
+        self.debug(d, f"    kwargs    = {kwargs}")
+        self.debug(d, ")")
+
+        if attribute != 'state':     raise Exception(f"Illegal format: {attribute}")
+        if old == new:               raise Exception(f"Illegal format: {old}")
+        if new not in ['on', 'off']: raise Exception(f"Illegal format: {new}")
+
+        if new == "on":
+            self.debug(d, f"  turn_on({self.g_init})")
+            self.turn_on(self.g_init)
+        else:
+            self.debug(d, f"  turn_off({self.g_init})")
+            self.turn_off(self.g_init)
+
+        self.debug(d, "return()")
+        self.g_debug -= 1
+
     def action_cb(self, entity, attribute, old, new, kwargs):
         self.g_debug += 1
         d = self.g_debug
@@ -127,7 +152,7 @@ class AutoLights(hass.Hass):
         self.debug(d, f"    new       = {new}")
         self.debug(d, f"    kwargs    = {kwargs}")
         self.debug(d, ")")
-        # if entity != self.g_init:    raise Exception(f"Illegal format: {entity}")
+
         if attribute != 'state':     raise Exception(f"Illegal format: {attribute}")
         if old == new:               raise Exception(f"Illegal format: {old}")
         if new not in ['on', 'off']: raise Exception(f"Illegal format: {new}")
